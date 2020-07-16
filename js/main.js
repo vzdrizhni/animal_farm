@@ -32,7 +32,11 @@ var GameState = {
     this.rightArrow.anchor.setTo(0.5);
     this.rightArrow.customParams = {direction: -1}
 
-    const animalData = [
+    this.rightArrow.inputEnabled = true;
+    this.rightArrow.input.pixelPerfectClick = true;
+    this.rightArrow.events.onInputDown.add(this.switchAnimal, this);
+
+    let animalData = [
       {key: 'chicken', text: 'CHICKEN'},
       {key: 'horse', text: 'HORSE'},
       {key: 'pig', text: 'PIG'},
@@ -40,17 +44,20 @@ var GameState = {
     ]
 
     this.animals = this.game.add.group();
-    const animal;
+    let animal;
 
-    animalData.forEach(animal => {
-      animal = this.create(200, this.world.centerY, animal.key);
+    animalData.forEach(elem => {
+      animal = this.animals.create(-1000, this.game.world.centerY, elem.key);
 
-      animal.customParams = {text: animal.text}
+      animal.customParams = {text: elem.text}
       animal.anchor.setTo(0.5);
       animal.inputEnabled = true;
       animal.input.pixelPerfectClick = true;
-      animal.event.onInputDown.add(this.animateAnimal, this);
-    })
+      animal.events.onInputDown.add(this.animateAnimal, this);
+    });
+
+    this.currentAnimal = this.animals.next();
+    this.currentAnimal.position.set(this.game.world.centerX, this.game.world.centerY);
 
   },
   //this is executed multiple times per second
@@ -59,7 +66,23 @@ var GameState = {
   },
 
   switchAnimal: function(sprite, event) {
-    console.log('move hui');
+    let newAnimal, endX;
+
+    if (sprite.customParams.direction > 0) {
+      newAnimal = this.animals.next();
+      endX = 640 + this.currentAnimal.width / 2;
+    } else {
+      newAnimal = this.animals.previous();
+      endX = -this.animals.width / 2;
+    }
+
+    this.currentAnimal.x = endX;
+    newAnimal.x = this.world.centerX;
+    this.currentAnimal = newAnimal;
+  },
+
+  animateAnimal: function(sprite, event) {
+    console.log(this.currentAnimal)
   }
 
 
