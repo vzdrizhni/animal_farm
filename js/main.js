@@ -67,6 +67,8 @@ var GameState = {
     this.currentAnimal = this.animals.next();
     this.currentAnimal.position.set(this.game.world.centerX, this.game.world.centerY);
 
+    this.showText(this.currentAnimal);
+
   },
   //this is executed multiple times per second
   update: function() {
@@ -82,6 +84,8 @@ var GameState = {
 
     this.isMoving = true;
 
+    this.animalText.visible = false;
+
     if (sprite.customParams.direction > 0) {
       newAnimal = this.animals.next();
       newAnimal.x = -newAnimal.width / 2;
@@ -96,6 +100,7 @@ var GameState = {
     animalMovement.to({x: this.game.world.centerX}, 1000);
     animalMovement.onComplete.add(function() {
       this.isMoving = false;
+      this.showText(newAnimal);
     }, this);
     animalMovement.start();
 
@@ -109,6 +114,15 @@ var GameState = {
   animateAnimal: function(sprite, event) {
     sprite.play('animate');
     sprite.customParams.sound.play();
+  },
+
+  showText: function(animal) {
+    if (!this.animalText) {
+      this.animalText = this.game.add.text(this.game.width / 2, this.game.height * 0.85, '');
+      this.animalText.anchor.setTo(0.5);
+    }
+    this.animalText.setText(animal.customParams.text);
+    this.animalText.visible = true;
   }
 
 
